@@ -1,0 +1,95 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'accounts/snippets/list_tabs.html' %}
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-responsive table-hover table-bordered text-center table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th width="14%"> Submission Id </th>
+                        <th width="26%"> Problem </th>
+                        <th width="8%"> Language </th>
+                        <th width="8%"> Status </th>
+                        <th width="8%"> Time </th>
+                        <th width="8%"> Memory </th>
+                        <th width="8%"> Who </th>
+                        <th width="20%"> When </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for submission in user_submissions %}
+                        <tr>
+                            <td>
+                                {% if submission.problem.is_protected %}
+                                    {{ submission.id }}
+                                {% else %}
+                                    <a href="{% url 'problemset:submission-details' submission.id %}"> {{ submission.id }}</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if submission.problem.is_protected %}
+                                    {{ submission.problem.name }}
+                                {% else %}
+                                    <a href="{% url 'problemset:problem-details' submission.problem.id %}">
+                                        {{ submission.problem.name }}
+                                    </a>
+                                {% endif %}
+                            </td>
+                             <td> {{ submission.solution_language }} </td>
+                             {% if submission.status == 'AC' %}
+                                    <td>
+                                        <span class="badge badge-success"> {{ submission.status }} </span>
+                                    </td>
+                             {% elif submission.status == 'WA'%}
+                                    <td>
+                                        <span class="badge badge-danger"> {{ submission.status }} </span>
+                                    </td>
+                             {% elif submission.status == 'TLE'%}
+                                 <td>
+                                    <span class="badge badge-warning"> {{ submission.status }} </span>
+                                </td>
+                             {% elif submission.status == 'CE'%}
+                                 <td>
+                                     <span class="badge badge-info"> {{ submission.status }} </span>
+                                 </td>
+                             {% elif submission.status == 'MLE'%}
+                                 <td>
+                                     <span class="badge badge-dark"> {{ submission.status }} </span>
+                                 </td>
+                             {% else %}
+                                 <td>
+                                     <span class="badge badge-primary"> {{ submission.status }} </span>
+                                 </td>
+                             {% endif %}
+                             <td> {{ 0 }} ms </td>
+                             <td> {{ 0 }} kb </td>
+                             <td>
+                                 <a
+                                         href="{% url 'accounts:user-profile' submission.user.username %}"
+                                         class="rank-text rank-{{ submission.user.profile.rank }}"
+                                 >
+                                     {{ submission.user }}
+                                 </a>
+                             </td>
+                             <td> {{ submission.created_at|date:"H:i | d-m-Y" }} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not user_submissions.count %}
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <img
+                            style="width: 40%; height: 40%; min-height: 250px; min-width: 250px;"
+                            alt="No Data"
+                            src="{% static 'images/svg/no_data.svg' %}"
+                    />
+                    <h4> No Submissions Available! </h4>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% include 'snippets/paginations.html' %}
+{% endblock %}

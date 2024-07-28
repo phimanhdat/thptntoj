@@ -1,0 +1,41 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'accounts/snippets/list_tabs.html' %}
+
+    {% if not user_blogs.count %}
+        <div class="d-flex flex-column justify-content-center align-items-center">
+            <img
+                    style="width: 40%; height: 40%; min-height: 250px; min-width: 250px;"
+                    alt="No Data"
+                    src="{% static 'images/svg/no_data.svg' %}"
+            />
+            <h4> No Blogs Available! </h4>
+        </div>
+    {% endif %}
+
+    {% for blog in user_blogs %}
+        <div class="card mt-2 mb-2">
+            <div class="card-header">
+                <h4> <a class="blog-title" href="{% url 'blog:blog-details' blog.id %}"> {{ blog.title }} </a>  </h4>
+                <h6>
+                    by
+                    <a class="rank-text rank-{{ blog.user.profile.rank }}" href="{% url 'accounts:user-profile' blog.user.username %}">
+                        {{ blog.user.username }}
+                    </a>, <small>{{blog.created_at}}</small>
+                </h6>
+            </div>
+            <div class="card-body">
+                {{ blog.content|safe|truncatechars_html:500 }}
+                {% if blog.content|length > 500 %}
+                    <a class="read-more" href="{% url 'blog:blog-details' blog.id %}"> Read More </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <hr />
+
+    {% include 'snippets/paginations.html' %}
+{% endblock %}
